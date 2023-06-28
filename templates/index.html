@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPT问答窗口</title>
+<!--  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">-->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPT问答窗口</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('../static/my.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .custom-container {
+      max-width: 80%;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: transparent;
+      border-radius: 5px;
+      margin: 50px auto 0;
+    }
+
+    .message-container {
+      height: 80vh;
+      overflow-y: scroll;
+      padding-bottom: 20px; /* 添加底部留白 */
+    }
+
+    .message {
+      margin-bottom: 10px;
+      display: flex;
+    }
+
+    .user-message {
+      justify-content: flex-end; /* 用户消息靠右对齐 */
+    }
+
+    .bot-message {
+      justify-content: flex-start; /* 机器人消息靠左对齐 */
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .message-text {
+      max-width: 60%; /* 消息文本最大宽度限制 */
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 8px;
+    }
+
+    .user-message .message-text {
+      background-color: #b3ffb0; /* 将背景色改为透明 */
+      /*color: #00FF00; !* 将字体颜色改为绿色 *!*/
+      text-align: right;
+      font-size: 1px; /* 设置字体大小为 14px */
+
+    }
+
+    .bot-message .message-text {
+      background-color: lavender; /* 将背景色改为透明 */
+      /*color: #00FF00; !* 将字体颜色改为绿色 *!*/
+      text-align: left;
+      font-size: 14px; /* 设置字体大小为 14px */
+
+    }
+
+    .time-stamp {
+      font-size: 12px;
+      color: #000000; /* 将时间戳颜色改为黑色 */
+      /*font-weight: bold; !* 加粗字体 *!*/
+      margin-top: 10px; /* 时间戳和消息内容之间的间距 */
+    }
+
+    .input-container {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      margin-right: 10px;
+      font-size: 12px;
+    }
+
+    .input-container button {
+      background-color: #007bff;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .message {
+      position: relative; /* 添加相对定位 */
+    }
+
+    .time-stamp {
+      position: absolute;
+      top: -25px; /* 负的偏移量将时间戳放在消息框的上方 */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="custom-container">
+    <div class="message-container" id="message-container">
+      <div class="message bot-message">
+        <img src="../static/robot.png" alt="机器人头像" class="avatar">
+        <div class="message-text">
+          <p>你好，我是聊天坤器人</p>
+        </div>
+        <div class="time-stamp">2023-06-27 10:30:15</div>
+      </div>
+<!--      <div class="message user-message">-->
+<!--        <div class="message-text">-->
+<!--          <p>这是用户的消息。</p>-->
+<!--        </div>-->
+<!--        <img src="my.png" alt="个人头像" class="avatar">-->
+<!--        <div class="time-stamp">2023-06-27 10:31:23</div>-->
+<!--      </div>-->
+    </div>
+    <div class="input-container">
+      <label for="message-input"></label><input type="text" id="message-input" placeholder="输入你的消息">
+      <button type="button" id="send-button">发送</button>
+    </div>
+  </div>
+
+  <script>
+    const messageContainer = document.getElementById("message-container");
+    const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-button");
+
+    // 新增回车发送功能
+    messageInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        sendButton.click();
+      }
+    });
+
+    sendButton.addEventListener("click", () => {
+      const userMessage = messageInput.value.trim();
+
+      if (userMessage === "") {
+        return;
+      }
+
+      const userMessageElement = document.createElement("div");
+      userMessageElement.classList.add("message", "user-message");
+      userMessageElement.innerHTML = `
+        <div class="time-stamp">${getCurrentTimestamp()}</div>
+        <div class="message-text">
+          <p>${userMessage}</p>
+        </div>
+        <img src="../static/my.png" alt="个人头像" class="avatar">
+      `;
+      messageContainer.appendChild(userMessageElement);
+
+      messageInput.value = "";
+      messageInput.focus();
+
+      // Replace with your actual GPT-3.5 integration code here
+      fetchChatResponse(userMessage);
+    });
+
+
+    async function fetchChatResponse(message) {
+      try {
+        var response = await fetch('https://api.binjie.fun/api/generateStream', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: message,
+            userId: '#/chat/1687858405863',
+            network: true,
+            system: '',
+            withoutContext: false,
+            stream: true
+          })
+        });
+
+        var reader = response.body.getReader();
+        const botMessageElement = document.createElement("div");
+        botMessageElement.classList.add("message", "bot-message");
+        botMessageElement.innerHTML = `
+          <img src="../static/robot.png" alt="机器人头像" class="avatar">
+          <div class="message-text">
+            <p style="display: inline"></p>
+          </div>
+          <div class="time-stamp">${getCurrentTimestamp()}</div>
+        `;
+
+        // Append the bot message element to the message container
+        messageContainer.appendChild(botMessageElement);
+
+        while (true) {
+          var { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+
+          var text = new TextDecoder().decode(value);
+          appendBotMessage(text);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    function appendBotMessage(message) {
+      const messageText = document.createElement("p");
+      messageText.style.display = "inline";
+      messageText.textContent = message + " ";
+
+      // Find the last bot message element in the message container
+      const lastBotMessageElement = messageContainer.lastElementChild;
+      if (
+        lastBotMessageElement &&
+        lastBotMessageElement.classList.contains("bot-message")
+      ) {
+        // Append the message text to the last bot message element
+        const lastBotMessageText = lastBotMessageElement.querySelector(
+          ".message-text"
+        );
+        lastBotMessageText.appendChild(messageText);
+      } else {
+        // Create a new bot message element
+        const botMessageElement = document.createElement("div");
+        botMessageElement.classList.add("message", "bot-message");
+        botMessageElement.innerHTML = `
+          <img src="../static/robot.png" alt="机器人头像" class="avatar">
+          <div class="message-text">${messageText}</div>
+          <div class="time-stamp">${getCurrentTimestamp()}</div>
+        `;
+
+        // Append the bot message element to the message container
+        messageContainer.appendChild(botMessageElement);
+      }
+
+      // Scroll to the bottom of the message container
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+
+    // 获取当前时间戳
+    function getCurrentTimestamp() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+  </script>
+</body>
+
+</html>
