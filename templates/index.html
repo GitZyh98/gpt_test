@@ -184,11 +184,13 @@
         var response = await fetch('https://api.binjie.fun/api/generateStream', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'referer': 'https://chat2.jinshutuan.com/',
+            'authority': 'api.binjie.fun',
           },
           body: JSON.stringify({
             prompt: message,
-            userId: '#/chat/1687858405863',
+            userId: '#/chat/1688013164091',
             network: true,
             system: '',
             withoutContext: false,
