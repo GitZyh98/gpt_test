@@ -179,52 +179,74 @@
     });
 
 
+    // async function fetchChatResponse(message) {
+    //   try {
+    //     var response = await fetch('https://api.binjie.fun/api/generateStream', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //         'referer': 'https://chat2.jinshutuan.com/',
+    //         'authority': 'api.binjie.fun',
+    //       },
+    //       body: JSON.stringify({
+    //         prompt: message,
+    //         userId: '#/chat/1688013164091',
+    //         network: true,
+    //         system: '',
+    //         withoutContext: false,
+    //         stream: true
+    //       })
+    //     });
+
+    //     var reader = response.body.getReader();
+    //     const botMessageElement = document.createElement("div");
+    //     botMessageElement.classList.add("message", "bot-message");
+    //     botMessageElement.innerHTML = `
+    //       <img src="../static/robot.png" alt="机器人头像" class="avatar">
+    //       <div class="message-text">
+    //         <p style="display: inline"></p>
+    //       </div>
+    //       <div class="time-stamp">${getCurrentTimestamp()}</div>
+    //     `;
+
+    //     // Append the bot message element to the message container
+    //     messageContainer.appendChild(botMessageElement);
+
+    //     while (true) {
+    //       var { done, value } = await reader.read();
+    //       if (done) {
+    //         break;
+    //       }
+
+    //       var text = new TextDecoder().decode(value);
+    //       appendBotMessage(text);
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
     async function fetchChatResponse(message) {
       try {
-        var response = await fetch('https://api.binjie.fun/api/generateStream', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'referer': 'https://chat2.jinshutuan.com/',
-            'authority': 'api.binjie.fun',
-          },
-          body: JSON.stringify({
-            prompt: message,
-            userId: '#/chat/1688013164091',
-            network: true,
-            system: '',
-            withoutContext: false,
-            stream: true
-          })
-        });
-
-        var reader = response.body.getReader();
         const botMessageElement = document.createElement("div");
         botMessageElement.classList.add("message", "bot-message");
         botMessageElement.innerHTML = `
           <img src="../static/robot.png" alt="机器人头像" class="avatar">
           <div class="message-text">
-            <p style="display: inline"></p>
+            <p>你干嘛哎呦</p>
           </div>
           <div class="time-stamp">${getCurrentTimestamp()}</div>
         `;
-
+        
         // Append the bot message element to the message container
         messageContainer.appendChild(botMessageElement);
-
-        while (true) {
-          var { done, value } = await reader.read();
-          if (done) {
-            break;
-          }
-
-          var text = new TextDecoder().decode(value);
-          appendBotMessage(text);
-        }
+        
+        // Scroll to the bottom of the message container
+        messageContainer.scrollTop = messageContainer.scrollHeight;
       } catch (error) {
         console.error(error);
       }
     }
+
 
     function appendBotMessage(message) {
       const messageText = document.createElement("p");
